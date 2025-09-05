@@ -1,0 +1,20 @@
+version: '3'
+services:
+  ecommercegiftcardDB:
+    image: postgres:15.3
+    container_name: ecommercegiftcard-db
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-ecommercegiftcard}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
