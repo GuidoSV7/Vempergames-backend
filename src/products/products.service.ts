@@ -44,34 +44,18 @@ export class ProductsService {
     }
 
     async findOne(id: string) {
-        const product = await this.productRepository
-            .createQueryBuilder('product')
-            .leftJoinAndSelect('product.category', 'category')
-            .addSelect('product.id', 'product_id')
-            .addSelect('product.title', 'product_title')
-            .addSelect('product.description', 'product_description')
-            .addSelect('product.imageUrl', 'product_imageUrl')
-            .addSelect('product.redeem', 'product_redeem')
-            .addSelect('product.termsConditions', 'product_termsConditions')
-            .addSelect('product.state', 'product_state')
-            .where('product.id = :id', { id })
-            .getRawOne();
+        const product = await this.productRepository.findOne({
+            where: { id },
+            relations: ['category']
+        });
 
         if (!product) {
             throw new NotFoundException(`Product with id ${id} not found`);
         }
 
-        // Transform the raw result to exclude categoryId
-        return {
-            id: product.product_id,
-            title: product.product_title,
-            description: product.product_description,
-            imageUrl: product.product_imageUrl,
-            redeem: product.product_redeem,
-            termsConditions: product.product_termsConditions,
-            state: product.product_state,
-            category: product.category
-        };
+        // Transform the result to exclude categoryId but include category
+        const { categoryId, ...productWithoutCategoryId } = product;
+        return productWithoutCategoryId;
     }
 
     async update(id: string, updateProductDto: UpdateProductDto) {
