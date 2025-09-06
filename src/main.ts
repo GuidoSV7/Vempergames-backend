@@ -9,9 +9,12 @@ async function bootstrap() {
     rawBody: true
   });
   app.enableCors({
-    origin: '*',
+    origin: true,
+    methods: '*',
+    allowedHeaders: '*',
     credentials: true
   });
+
   const logger = new Logger('Bootstrap');
 
   app.setGlobalPrefix('api');
