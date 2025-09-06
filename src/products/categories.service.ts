@@ -17,7 +17,13 @@ export class CategoriesService {
 
     async create(createCategoryDto: CreateCategoryDto) {
         try {
-            const category = this.categoryRepository.create(createCategoryDto);
+            // Si no se proporciona state, por defecto es true
+            const categoryData = {
+                ...createCategoryDto,
+                state: createCategoryDto.state !== undefined ? createCategoryDto.state : true
+            };
+            
+            const category = this.categoryRepository.create(categoryData);
             const savedCategory = await this.categoryRepository.save(category);
             
             return this.findOne(savedCategory.id);
