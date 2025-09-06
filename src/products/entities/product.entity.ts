@@ -16,8 +16,8 @@ export class Product {
   title: string;
 
   @ApiProperty({
-    description: 'Descripción del producto',
-    example: 'Gift card de Amazon por valor de $50 USD'
+    description: 'Descripción del producto (HTML/Markdown)',
+    example: '<p>Gift card de Amazon por valor de $50 USD</p><ul><li>Válido en toda la tienda</li><li>Sin fecha de expiración</li></ul>'
   })
   @Column('text')
   description: string;
@@ -37,8 +37,8 @@ export class Product {
   redeem: string;
 
   @ApiProperty({
-    description: 'Términos y condiciones del producto',
-    example: 'Válido por 1 año desde la compra'
+    description: 'Términos y condiciones del producto (HTML/Markdown)',
+    example: '<h3>Términos y Condiciones</h3><p>Válido por 1 año desde la compra</p><table><tr><th>Restricción</th><th>Detalle</th></tr><tr><td>Región</td><td>Estados Unidos</td></tr></table>'
   })
   @Column('text')
   termsConditions: string;

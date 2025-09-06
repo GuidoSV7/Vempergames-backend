@@ -18,8 +18,15 @@ export class CategoriesController {
   }
 
   @Get()
+  @ApiResponse({status:200, description:'Categorías activas obtenidas exitosamente', type: [Category]})
   findAll( @Query() paginationDto:PaginationDto)  {
     return this.categoriesService.findAll(paginationDto);
+  }
+
+  @Get('admin/all')
+  @ApiResponse({status:200, description:'Todas las categorías (activas e inactivas)', type: [Category]})
+  findAllWithAllStates( @Query() paginationDto:PaginationDto)  {
+    return this.categoriesService.findAllWithAllStates(paginationDto);
   }
 
   @Get(':id')
@@ -35,7 +42,17 @@ export class CategoriesController {
   }
 
   @Delete(':id')
+  @ApiResponse({status:200, description:'Categoría eliminada exitosamente (soft delete)', type: Category})
+  @ApiResponse({status:404, description:'Categoría no encontrada'})
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(id);
+  }
+
+  @Patch(':id/restore')
+  @ApiResponse({status:200, description:'Categoría restaurada exitosamente', type: Category})
+  @ApiResponse({status:400, description:'Bad Request - Categoría no está eliminada'})
+  @ApiResponse({status:404, description:'Categoría no encontrada'})
+  restore(@Param('id') id: string) {
+    return this.categoriesService.restore(id);
   }
 }

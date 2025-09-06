@@ -14,6 +14,13 @@ export class Category {
   @Column('text', { unique: true })
   name: string;
 
+  @ApiProperty({
+    description: 'Estado de la categoría (soft delete)',
+    example: true
+  })
+  @Column('boolean', { default: true })
+  state: boolean;
+
   @OneToMany(() => Product, product => product.category)
   products: Product[];
 }

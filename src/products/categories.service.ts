@@ -30,8 +30,19 @@ export class CategoriesService {
     findAll(paginationDto: PaginationDto) {
         const { limit = 10, offset = 0 } = paginationDto;
         return this.categoryRepository.find({
+            where: { state: true }, // Solo categorías activas
             take: limit,
             skip: offset,
+            order: { name: 'ASC' }
+        });
+    }
+
+    findAllWithAllStates(paginationDto: PaginationDto) {
+        const { limit = 10, offset = 0 } = paginationDto;
+        return this.categoryRepository.find({
+            take: limit,
+            skip: offset,
+            order: { name: 'ASC' }
         });
     }
 
@@ -89,16 +100,49 @@ export class CategoriesService {
                 throw new NotFoundException(`Category with id ${id} not found`);
             }
 
-            await this.categoryRepository.remove(category);
+            // Soft delete: cambiar state a false
+            category.state = false;
+            await this.categoryRepository.save(category);
             
             return {
-                message: `Category with id ${id} was successfully deleted.`
+                message: `Category with id ${id} was successfully deleted (soft delete).`,
+                category
             };
         } catch (error) {
             if (error instanceof NotFoundException) {
                 throw error;
             }
             throw new InternalServerErrorException('Error while removing category');
+        }
+    }
+
+    async restore(id: string) {
+        try {
+            const category = await this.categoryRepository.findOne({ 
+                where: { id } 
+            });
+            
+            if (!category) {
+                throw new NotFoundException(`Category with id ${id} not found`);
+            }
+
+            if (category.state) {
+                throw new InternalServerErrorException('Category is not deleted');
+            }
+
+            // Restaurar: cambiar state a true
+            category.state = true;
+            await this.categoryRepository.save(category);
+            
+            return {
+                message: `Category with id ${id} was successfully restored.`,
+                category
+            };
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof InternalServerErrorException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Error while restoring category');
         }
     }
 
