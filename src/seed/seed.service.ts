@@ -111,10 +111,6 @@ export class SeedService {
     const savedMember = await this.memberRepository.save(member);
 
     this.logger.log('✅ Usuarios creados:');
-    this.logger.log(`   🚀 SuperAdmin: ${savedSuperAdmin.email} (password: 123456)`);
-    this.logger.log(`   👑 Admin: ${savedAdmin.email} (password: 123456)`);
-    this.logger.log(`   👤 Member: ${savedMember.email} (password: 123456)`);
-
     return savedSuperAdmin;
   }
 }

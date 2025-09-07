@@ -7,7 +7,6 @@ export class Member extends User {
   @Column('decimal', {
     precision: 10,
     scale: 2,
-    default: 0,
     nullable: true
   })
   balance?: number;
@@ -15,7 +14,6 @@ export class Member extends User {
   @Column('decimal', {
     precision: 5,
     scale: 2,
-    default: 0,
     nullable: true
   })
   discount?: number;
