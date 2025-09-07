@@ -9,6 +9,7 @@ import { LoginUserDto, CreateUserDto } from './dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { Member } from 'src/users/entities/member.entity';
 import { Admin } from 'src/users/entities/admin.entity';
+import { SuperAdmin } from 'src/users/entities/super-admin.entity';
 
 @Injectable()
 export class AuthService {
@@ -19,28 +20,49 @@ export class AuthService {
     private readonly memberRepository: Repository<Member>,
     @InjectRepository(Admin)
     private readonly adminRepository: Repository<Admin>,
+    @InjectRepository(SuperAdmin)
+    private readonly superAdminRepository: Repository<SuperAdmin>,
     private readonly jwtService: JwtService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
       const { password, roles = 'member', ...userData } = createUserDto;
+      const hashedPassword = bcrypt.hashSync(password, 10);
 
-      // Create and save the user first
-      const user = this.userRepository.create({
-        ...userData,
-        roles,
-        password: bcrypt.hashSync(password, 10)
-      });
-      const savedUser = await this.userRepository.save(user);
+      let savedUser;
 
-      if (savedUser.roles === 'member') {
-        await this.memberRepository.save(savedUser);
-      }
-
-      if (savedUser.roles === 'admin') {
-        // Save the admin
-        await this.adminRepository.save(savedUser);
+      if (roles === 'member') {
+        const member = this.memberRepository.create({
+          ...userData,
+          roles: 'member',
+          password: hashedPassword,
+          balance: 0,
+          discount: 0,
+          isActive: true
+        });
+        savedUser = await this.memberRepository.save(member);
+      } else if (roles === 'admin') {
+        const admin = this.adminRepository.create({
+          ...userData,
+          roles: 'admin',
+          password: hashedPassword
+        });
+        savedUser = await this.adminRepository.save(admin);
+      } else if (roles === 'superadmin') {
+        const superAdmin = this.superAdminRepository.create({
+          ...userData,
+          roles: 'superadmin',
+          password: hashedPassword
+        });
+        savedUser = await this.superAdminRepository.save(superAdmin);
+      } else {
+        const user = this.userRepository.create({
+          ...userData,
+          roles,
+          password: hashedPassword
+        });
+        savedUser = await this.userRepository.save(user);
       }
 
       // Remove password from response
@@ -52,7 +74,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      this.handleDBErrors(error);
+      throw new BadRequestException('Error creating user');
     }
   }
 
@@ -84,7 +106,7 @@ export class AuthService {
     return {
       ...userWithoutPassword,
       token: this.getJwtToken({ id: user.id }),
-      adminData: adminData
+      adminData
     };
   }
 
@@ -93,11 +115,10 @@ export class AuthService {
     return token;
   }
 
-  private handleDBErrors(error: any): never {
-    if (error.code === '23505')
-      throw new BadRequestException(error.detail);
-    
-    console.log(error);
-    throw new InternalServerErrorException('Please check server logs');
+  async checkAuthStatus(user: User) {
+    return {
+      ...user,
+      token: this.getJwtToken({ id: user.id })
+    };
   }
 }

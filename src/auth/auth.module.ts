@@ -10,6 +10,7 @@ import { User } from './entities/user.entity';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { Member } from 'src/users/entities/member.entity';
 import { Admin } from 'src/users/entities/admin.entity';
+import { SuperAdmin } from 'src/users/entities/super-admin.entity';
 
 @Module({
   controllers: [AuthController],
@@ -17,7 +18,7 @@ import { Admin } from 'src/users/entities/admin.entity';
   imports: [
     ConfigModule,
     
-    TypeOrmModule.forFeature([ User, Member, Admin ]),
+    TypeOrmModule.forFeature([ User, Member, Admin, SuperAdmin ]),
 
     PassportModule.register({ defaultStrategy: 'jwt' }),
 
