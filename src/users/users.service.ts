@@ -94,9 +94,8 @@ export class UsersService {
 
       this.logger.log(`Buscando miembros con límite: ${limit}, offset: ${offset}`);
 
-      // Obtener usuarios con rol 'member' de la tabla users
-      const members = await this.userRepository.find({
-        where: { rol: 'member' },
+      // Obtener miembros usando la entidad Member específica
+      const members = await this.memberRepository.find({
         take: limit,
         skip: offset,
         order: {

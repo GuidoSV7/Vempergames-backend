@@ -1,8 +1,8 @@
 import { User } from "src/auth/entities/user.entity";
 import { Entity } from "typeorm";
 
-@Entity('admins')
+@Entity('users')
 export class Admin extends User {
-  // Admin hereda de User sin agregar propiedades específicas
-  // Puede usar todas las propiedades de User
+  // Admin hereda todos los campos de User
+  // El campo 'type' se establecerá automáticamente como 'Admin'
 }

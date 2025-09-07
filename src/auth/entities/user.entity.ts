@@ -1,6 +1,7 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn, TableInheritance } from 'typeorm';
 
 @Entity('users')
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export class User {
     
     @PrimaryGeneratedColumn('uuid')
