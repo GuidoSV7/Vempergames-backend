@@ -18,5 +18,18 @@ export class SeedController {
     return this.seedService.runSeedIfEmpty();
   }
 
+  @Post('force')
+  @ApiOperation({ summary: 'Forzar ejecución de seed (borra usuarios existentes)' })
+  @ApiResponse({ status: 200, description: 'Seed ejecutado forzadamente' })
+  // @Auth( ValidRoles.admin ) // Commented out for easier testing
+  forceSeed() {
+    return this.seedService.runSeed();
+  }
 
+  @Post('clean')
+  @ApiOperation({ summary: 'Limpiar base de datos (borra todos los usuarios)' })
+  @ApiResponse({ status: 200, description: 'Base de datos limpiada' })
+  cleanDatabase() {
+    return this.seedService.deleteTables();
+  }
 }

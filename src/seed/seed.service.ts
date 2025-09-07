@@ -63,16 +63,14 @@ export class SeedService {
     return 'FORCE SEED EXECUTED';
   }
 
-  private async deleteTables() {
+  async deleteTables() {
     this.logger.log('🗑️ Limpiando tablas existentes...');
     
-    // Limpiar todas las tablas en orden correcto
-    await this.memberRepository.delete({});
-    await this.adminRepository.delete({});
-    await this.superAdminRepository.delete({});
+    // Con @ChildEntity, todas las entidades se guardan en la misma tabla 'users'
+    // Solo necesitamos limpiar la tabla principal
     await this.userRepository.delete({});
     
-    this.logger.log('✅ Tablas limpiadas');
+    this.logger.log('✅ Tabla users limpiada');
   }
 
   private async insertUsers() {
