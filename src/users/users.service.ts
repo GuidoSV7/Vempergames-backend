@@ -9,6 +9,7 @@ import { CreateUserDto } from 'src/auth/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Admin } from './entities/admin.entity';
 import { Member } from './entities/member.entity';
+import { SuperAdmin } from './entities/super-admin.entity';
 // import { Parking } from 'src/parkings/entities/parking.entity';
 
 @Injectable()
@@ -31,30 +32,51 @@ export class UsersService {
     @InjectRepository(Member)
     private readonly memberRepository: Repository<Member>,
 
+    @InjectRepository(SuperAdmin)
+    private readonly superAdminRepository: Repository<SuperAdmin>,
+
 
     private readonly dataSource: DataSource,
   ){}
 
   async create(createUserDto: CreateUserDto) {
     try {
-      const {password, rol = 'member', ...UserDetails} = createUserDto;
+      const {password, roles = 'member', ...UserDetails} = createUserDto;
       
-      // Crear usuario con valores por defecto según el rol
-      const userData: any = {
-        ...UserDetails,
-        password: bcrypt.hashSync( password, 10 ),
-        rol
-      };
-
-      // Si es miembro, agregar campos específicos
-      if (rol === 'member') {
-        userData.balance = 0;
-        userData.discount = 0;
-        userData.isActive = true;
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      
+      if (roles === 'member') {
+        const member = this.memberRepository.create({
+          ...UserDetails,
+          password: hashedPassword,
+          roles: 'member',
+          balance: 0,
+          discount: 0,
+          isActive: true
+        });
+        return await this.memberRepository.save(member);
+      } else if (roles === 'admin') {
+        const admin = this.adminRepository.create({
+          ...UserDetails,
+          password: hashedPassword,
+          roles: 'admin'
+        });
+        return await this.adminRepository.save(admin);
+      } else if (roles === 'superadmin') {
+        const superAdmin = this.superAdminRepository.create({
+          ...UserDetails,
+          password: hashedPassword,
+          roles: 'superadmin'
+        });
+        return await this.superAdminRepository.save(superAdmin);
+      } else {
+        const user = this.userRepository.create({
+          ...UserDetails,
+          password: hashedPassword,
+          roles
+        });
+        return await this.userRepository.save(user);
       }
-
-      const user = this.userRepository.create(userData);
-      return await this.userRepository.save(user);
       
     } catch (error) {
       

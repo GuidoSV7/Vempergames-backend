@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../auth/entities/user.entity';
 import { Member } from '../users/entities/member.entity';
 import { Admin } from '../users/entities/admin.entity';
+import { SuperAdmin } from '../users/entities/super-admin.entity';
 
 @Injectable()
 export class SeedService {
@@ -18,7 +19,9 @@ export class SeedService {
     @InjectRepository( Member )
     private readonly memberRepository: Repository<Member>,
     @InjectRepository( Admin )
-    private readonly adminRepository: Repository<Admin>
+    private readonly adminRepository: Repository<Admin>,
+    @InjectRepository( SuperAdmin )
+    private readonly superAdminRepository: Repository<SuperAdmin>
   ) {}
 
   async runSeed() {
@@ -66,6 +69,7 @@ export class SeedService {
     // Limpiar todas las tablas en orden correcto
     await this.memberRepository.delete({});
     await this.adminRepository.delete({});
+    await this.superAdminRepository.delete({});
     await this.userRepository.delete({});
     
     this.logger.log('✅ Tablas limpiadas');
@@ -74,12 +78,21 @@ export class SeedService {
   private async insertUsers() {
     this.logger.log('👥 Creando usuarios de prueba...');
 
+    // Crear usuario SuperAdmin
+    const superAdmin = this.superAdminRepository.create({
+      email: 'superadmin@gmail.com',
+      userName: 'SuperAdmin',
+      password: bcrypt.hashSync('123456', 10),
+      roles: 'superadmin',
+      type: 'SuperAdmin' // Establecer explícitamente el tipo
+    });
+
     // Crear usuario Admin
     const admin = this.adminRepository.create({
       email: 'admin@gmail.com',
       userName: 'Admin',
       password: bcrypt.hashSync('123456', 10),
-      rol: 'admin',
+      roles: 'admin',
       type: 'Admin' // Establecer explícitamente el tipo
     });
 
@@ -88,7 +101,7 @@ export class SeedService {
       email: 'member@gmail.com',
       userName: 'Member',
       password: bcrypt.hashSync('123456', 10),
-      rol: 'member',
+      roles: 'member',
       balance: 0,
       discount: 0,
       isActive: true,
@@ -96,13 +109,15 @@ export class SeedService {
     });
 
     // Guardar usuarios
+    const savedSuperAdmin = await this.superAdminRepository.save(superAdmin);
     const savedAdmin = await this.adminRepository.save(admin);
     const savedMember = await this.memberRepository.save(member);
 
     this.logger.log('✅ Usuarios creados:');
+    this.logger.log(`   🚀 SuperAdmin: ${savedSuperAdmin.email} (password: 123456)`);
     this.logger.log(`   👑 Admin: ${savedAdmin.email} (password: 123456)`);
     this.logger.log(`   👤 Member: ${savedMember.email} (password: 123456)`);
 
-    return savedAdmin;
+    return savedSuperAdmin;
   }
 }

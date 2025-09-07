@@ -6,11 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { Member } from './entities/member.entity';
 import { Admin } from './entities/admin.entity';
+import { SuperAdmin } from './entities/super-admin.entity';
 
 @Module({
   controllers: [UsersController],
   providers: [UsersService],
-  imports:[TypeOrmModule.forFeature([User, Member, Admin]),
+  imports:[TypeOrmModule.forFeature([User, Member, Admin, SuperAdmin]),
     AuthModule
   ],
   exports: [UsersService, TypeOrmModule]

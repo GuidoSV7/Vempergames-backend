@@ -5,6 +5,7 @@ import { AuthModule } from './../auth/auth.module';
 import { User } from '../auth/entities/user.entity';
 import { Member } from '../users/entities/member.entity';
 import { Admin } from '../users/entities/admin.entity';
+import { SuperAdmin } from '../users/entities/super-admin.entity';
 
 import { SeedService } from './seed.service';
 import { SeedController } from './seed.controller';
@@ -13,7 +14,7 @@ import { SeedController } from './seed.controller';
   controllers: [SeedController],
   providers: [SeedService],
   imports: [
-    TypeOrmModule.forFeature([User, Member, Admin]),
+    TypeOrmModule.forFeature([User, Member, Admin, SuperAdmin]),
     AuthModule,
   ]
 })

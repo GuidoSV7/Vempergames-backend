@@ -23,28 +23,12 @@ export class User {
     @Column('text', {
         default: 'member'
     })
-    rol: string;
+    roles: string;
 
     @Column('timestamp', {
         default: () => 'CURRENT_TIMESTAMP'
     })
     registrationDate: Date;
-
-    @Column('decimal', {
-        precision: 10,
-        scale: 2,
-        default: 0,
-        nullable: true
-    })
-    balance?: number;
-
-    @Column('decimal', {
-        precision: 5,
-        scale: 2,
-        default: 0,
-        nullable: true
-    })
-    discount?: number;
 
     @Column('boolean', {
         default: true,
