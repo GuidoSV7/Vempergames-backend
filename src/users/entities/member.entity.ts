@@ -1,7 +1,8 @@
 import { User } from "src/auth/entities/user.entity";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, TableInheritance } from "typeorm";
 
-@Entity('members')
+@Entity('users')
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export class Member extends User {
   
   @Column('decimal', {

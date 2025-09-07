@@ -29,6 +29,28 @@ export class User {
     })
     registrationDate: Date;
 
+    @Column('decimal', {
+        precision: 10,
+        scale: 2,
+        default: 0,
+        nullable: true
+    })
+    balance?: number;
+
+    @Column('decimal', {
+        precision: 5,
+        scale: 2,
+        default: 0,
+        nullable: true
+    })
+    discount?: number;
+
+    @Column('boolean', {
+        default: true,
+        nullable: true
+    })
+    isActive?: boolean;
+
     @BeforeInsert()
     checkFieldsBeforeInsert() {
         this.email = this.email.toLowerCase().trim();

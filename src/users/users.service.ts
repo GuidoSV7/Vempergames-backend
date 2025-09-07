@@ -37,12 +37,23 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     try {
-      const {password, ...UserDetails} = createUserDto;
-      const user= this.userRepository.create({
+      const {password, rol = 'member', ...UserDetails} = createUserDto;
+      
+      // Crear usuario con valores por defecto según el rol
+      const userData: any = {
         ...UserDetails,
-        password: bcrypt.hashSync( password, 10 )
-      });
+        password: bcrypt.hashSync( password, 10 ),
+        rol
+      };
 
+      // Si es miembro, agregar campos específicos
+      if (rol === 'member') {
+        userData.balance = 0;
+        userData.discount = 0;
+        userData.isActive = true;
+      }
+
+      const user = this.userRepository.create(userData);
       return await this.userRepository.save(user);
       
     } catch (error) {
@@ -77,17 +88,44 @@ export class UsersService {
     
   }
 
-  findAllMembers(paginationDto:PaginationDto) {
+  async findAllMembers(paginationDto:PaginationDto) {
+    try {
+      const {limit = 100, offset = 0} = paginationDto;
 
-    const {limit = 10, offset = 0} = paginationDto;
+      this.logger.log(`Buscando miembros con límite: ${limit}, offset: ${offset}`);
 
-    return this.memberRepository.find({
-      take: limit,
-      skip: offset,
-     
+      // Obtener usuarios con rol 'member' de la tabla users
+      const members = await this.userRepository.find({
+        where: { rol: 'member' },
+        take: limit,
+        skip: offset,
+        order: {
+          registrationDate: 'DESC'
+        }
+      });
 
-    });
-    
+      this.logger.log(`Encontrados ${members.length} miembros en la base de datos`);
+
+      // Asegurar que todos los miembros tengan los campos requeridos
+      const membersWithDefaults = members.map(member => {
+        const processedMember = {
+          ...member,
+          balance: typeof member.balance === 'number' ? member.balance : 0,
+          discount: typeof member.discount === 'number' ? member.discount : 0,
+          isActive: member.isActive !== undefined ? member.isActive : true
+        };
+        
+        this.logger.log(`Procesando miembro: ${member.userName} (ID: ${member.id})`);
+        return processedMember;
+      });
+
+      this.logger.log(`Devolviendo ${membersWithDefaults.length} miembros procesados`);
+      return membersWithDefaults;
+    } catch (error) {
+      this.logger.error('Error al obtener miembros:', error.message);
+      this.logger.error('Stack trace:', error.stack);
+      throw new InternalServerErrorException('Error al obtener la lista de miembros');
+    }
   }
 
   async findOne(id : string) {
