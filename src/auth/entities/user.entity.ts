@@ -52,6 +52,11 @@ export class User {
     })
     isActive?: boolean;
 
+    @Column('varchar', {
+        nullable: true
+    })
+    type?: string;
+
     @BeforeInsert()
     checkFieldsBeforeInsert() {
         this.email = this.email.toLowerCase().trim();

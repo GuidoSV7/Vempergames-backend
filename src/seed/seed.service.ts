@@ -79,7 +79,8 @@ export class SeedService {
       email: 'admin@gmail.com',
       userName: 'Admin',
       password: bcrypt.hashSync('123456', 10),
-      rol: 'admin'
+      rol: 'admin',
+      type: 'Admin' // Establecer explícitamente el tipo
     });
 
     // Crear usuario Member
@@ -90,7 +91,8 @@ export class SeedService {
       rol: 'member',
       balance: 0,
       discount: 0,
-      isActive: true
+      isActive: true,
+      type: 'Member' // Establecer explícitamente el tipo
     });
 
     // Guardar usuarios
