@@ -24,21 +24,21 @@ export class AuthService {
 
   async create(createUserDto: CreateUserDto) {
     try {
-      const { password, rol = 'member', ...userData } = createUserDto;
+      const { password, roles = 'member', ...userData } = createUserDto;
 
       // Create and save the user first
       const user = this.userRepository.create({
         ...userData,
-        rol,
+        roles,
         password: bcrypt.hashSync(password, 10)
       });
       const savedUser = await this.userRepository.save(user);
 
-      if (savedUser.rol === 'member') {
+      if (savedUser.roles === 'member') {
         await this.memberRepository.save(savedUser);
       }
 
-      if (savedUser.rol === 'admin') {
+      if (savedUser.roles === 'admin') {
         // Save the admin
         await this.adminRepository.save(savedUser);
       }
@@ -62,7 +62,7 @@ export class AuthService {
     // First find user with basic info + role
     const user = await this.userRepository.findOne({
       where: { email },
-      select: { email: true, password: true, rol: true, id: true }
+      select: { email: true, password: true, roles: true, id: true }
     });
   
     if (!user)
@@ -73,7 +73,7 @@ export class AuthService {
   
     // If user is an admin, get associated data
     let adminData = null;
-    if (user.rol === 'admin') {
+    if (user.roles === 'admin') {
       // Here you can add logic for admin-specific data
       adminData = { role: 'admin' };
     }
