@@ -25,9 +25,9 @@ export class UsersController {
 
  
 
-  @Get('/members')
+  @Get('members/all')
   findAllMembers( @Query() paginationDto:PaginationDto)  {
-    console.log('Controlador: Recibida petición GET /users/members con parámetros:', paginationDto);
+    console.log('Controlador: Recibida petición GET /users/members/all con parámetros:', paginationDto);
     return this.usersService.findAllMembers(paginationDto);
   }
 
