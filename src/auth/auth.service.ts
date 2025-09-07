@@ -46,21 +46,24 @@ export class AuthService {
         const admin = this.adminRepository.create({
           ...userData,
           roles: 'admin',
-          password: hashedPassword
+          password: hashedPassword,
+          isActive: true
         });
         savedUser = await this.adminRepository.save(admin);
       } else if (roles === 'superadmin') {
         const superAdmin = this.superAdminRepository.create({
           ...userData,
           roles: 'superadmin',
-          password: hashedPassword
+          password: hashedPassword,
+          isActive: true
         });
         savedUser = await this.superAdminRepository.save(superAdmin);
       } else {
         const user = this.userRepository.create({
           ...userData,
           roles,
-          password: hashedPassword
+          password: hashedPassword,
+          isActive: true
         });
         savedUser = await this.userRepository.save(user);
       }
@@ -74,6 +77,7 @@ export class AuthService {
       };
 
     } catch (error) {
+      console.error('Error creating user:', error);
       throw new BadRequestException('Error creating user');
     }
   }

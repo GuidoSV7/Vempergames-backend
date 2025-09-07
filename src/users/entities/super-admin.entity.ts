@@ -1,9 +1,9 @@
 import { User } from "src/auth/entities/user.entity";
-import { Entity } from "typeorm";
+import { ChildEntity } from "typeorm";
 
-@Entity('users')
+@ChildEntity('superadmin')
 export class SuperAdmin extends User {
   // SuperAdmin hereda todos los campos de User
   // El campo 'type' se establecerá automáticamente como 'SuperAdmin'
-  // Puede tener campos específicos en el futuro si es necesario
+  // No tiene campos específicos como balance o discount
 }

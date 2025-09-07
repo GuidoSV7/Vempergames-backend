@@ -84,7 +84,7 @@ export class SeedService {
       userName: 'SuperAdmin',
       password: bcrypt.hashSync('123456', 10),
       roles: 'superadmin',
-      type: 'SuperAdmin' // Establecer explícitamente el tipo
+      isActive: true
     });
 
     // Crear usuario Admin
@@ -93,7 +93,7 @@ export class SeedService {
       userName: 'Admin',
       password: bcrypt.hashSync('123456', 10),
       roles: 'admin',
-      type: 'Admin' // Establecer explícitamente el tipo
+      isActive: true
     });
 
     // Crear usuario Member
@@ -104,8 +104,7 @@ export class SeedService {
       roles: 'member',
       balance: 0,
       discount: 0,
-      isActive: true,
-      type: 'Member' // Establecer explícitamente el tipo
+      isActive: true
     });
 
     // Guardar usuarios

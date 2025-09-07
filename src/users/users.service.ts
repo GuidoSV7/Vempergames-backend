@@ -59,21 +59,24 @@ export class UsersService {
         const admin = this.adminRepository.create({
           ...UserDetails,
           password: hashedPassword,
-          roles: 'admin'
+          roles: 'admin',
+          isActive: true
         });
         return await this.adminRepository.save(admin);
       } else if (roles === 'superadmin') {
         const superAdmin = this.superAdminRepository.create({
           ...UserDetails,
           password: hashedPassword,
-          roles: 'superadmin'
+          roles: 'superadmin',
+          isActive: true
         });
         return await this.superAdminRepository.save(superAdmin);
       } else {
         const user = this.userRepository.create({
           ...UserDetails,
           password: hashedPassword,
-          roles
+          roles,
+          isActive: true
         });
         return await this.userRepository.save(user);
       }

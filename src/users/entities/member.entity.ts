@@ -1,7 +1,7 @@
 import { User } from "src/auth/entities/user.entity";
-import { Entity, Column } from "typeorm";
+import { Column, ChildEntity } from "typeorm";
 
-@Entity('users')
+@ChildEntity('member')  
 export class Member extends User {
   // Campos específicos de Member
   @Column('decimal', {
