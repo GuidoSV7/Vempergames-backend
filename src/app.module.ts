@@ -8,13 +8,13 @@ import { CommonModule } from './common/common.module';
 import { SeedModule } from './seed/seed.module';
 import { FilesModule } from './files/files.module';
 import { AuthModule } from './auth/auth.module';
-
+import { GoogleAuthModule } from './google-auth/google-auth.module';
 
 import { UsersModule } from './users/users.module';
 
 import { PaymentsModule } from './payments/payments.module';
-;
 import { ProductsModule } from './products/products.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -49,6 +49,8 @@ import { ProductsModule } from './products/products.module';
 
     AuthModule,
 
+    GoogleAuthModule,
+
     UsersModule,
 
 
@@ -59,9 +61,9 @@ import { ProductsModule } from './products/products.module';
 
 
 
-    ProductsModule
+    ProductsModule,
 
-
+    ChatModule
 
   ],
 })

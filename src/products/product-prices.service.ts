@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, Not, IsNull } from 'typeorm';
 import { CreateProductPriceDto, UpdateProductPriceDto } from './dto';
 import { ProductPrices } from './entities/product-prices.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
@@ -124,6 +124,58 @@ export class ProductPricesService {
         } catch (error) {
             this.logger.error(error.message);
             throw new InternalServerErrorException(error.message);
+        }
+    }
+
+    // Métodos para manejar ofertas
+    async findActiveOffersByProduct(productId: string) {
+        try {
+            return await this.productPriceRepository.find({
+                where: { 
+                    productId,
+                    state: true,
+                    discountPercentage: Not(null)
+                },
+                relations: ['product'],
+                order: { discountPercentage: 'DESC' }
+            });
+        } catch (error) {
+            this.logger.error(error.message);
+            throw new InternalServerErrorException('Error finding active offers by product');
+        }
+    }
+
+    async findRegularPriceByProduct(productId: string) {
+        try {
+            return await this.productPriceRepository.findOne({
+                where: { 
+                    productId,
+                    state: true,
+                    discountPercentage: IsNull()
+                },
+                relations: ['product']
+            });
+        } catch (error) {
+            this.logger.error(error.message);
+            throw new InternalServerErrorException('Error finding regular price by product');
+        }
+    }
+
+    async calculateFinalPrice(price: ProductPrices): Promise<number> {
+        if (price.discountPercentage && price.discountPercentage > 0) {
+            return price.value * (1 - price.discountPercentage / 100);
+        }
+        return price.value;
+    }
+
+    async togglePriceState(id: string) {
+        try {
+            const price = await this.findOne(id);
+            price.state = !price.state;
+            return await this.productPriceRepository.save(price);
+        } catch (error) {
+            this.logger.error(error.message);
+            throw new InternalServerErrorException('Error toggling price state');
         }
     }
 }

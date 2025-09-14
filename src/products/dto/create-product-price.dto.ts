@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber, IsUUID, IsPositive } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsUUID, IsPositive, IsOptional, IsBoolean, Min, Max } from 'class-validator';
 
 export class CreateProductPriceDto {
   @ApiProperty({
@@ -17,6 +17,26 @@ export class CreateProductPriceDto {
   @IsNumber()
   @IsPositive()
   value: number;
+
+  @ApiProperty({
+    description: 'Porcentaje de descuento (0-100)',
+    example: 30,
+    required: false
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  discountPercentage?: number;
+
+  @ApiProperty({
+    description: 'Estado del precio (activo/inactivo)',
+    example: true,
+    required: false
+  })
+  @IsOptional()
+  @IsBoolean()
+  state?: boolean;
 
   @ApiProperty({
     description: 'ID del producto al que pertenece este precio',

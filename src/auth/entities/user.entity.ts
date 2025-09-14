@@ -13,12 +13,19 @@ export class User {
     email: string;
 
     @Column('text', {
-        select: false
+        select: false,
+        nullable: true
     })
     password: string;
 
     @Column('text')
     userName: string;
+
+    @Column('text', {
+        nullable: true,
+        unique: true
+    })
+    googleId?: string;
 
     @Column('text', {
         default: 'member'

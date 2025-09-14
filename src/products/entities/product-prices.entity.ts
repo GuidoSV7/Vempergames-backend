@@ -15,6 +15,18 @@ export class ProductPrices {
   })
   value: number;
 
+  @Column('decimal', {
+    precision: 5,
+    scale: 2,
+    nullable: true
+  })
+  discountPercentage: number;
+
+  @Column('boolean', {
+    default: true
+  })
+  state: boolean;
+
   @Column('uuid')
   productId: string;
 

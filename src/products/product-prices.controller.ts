@@ -27,6 +27,18 @@ export class ProductPricesController {
     return this.productPricesService.findByProduct(productId);
   }
 
+  @Get('product/:productId/offers')
+  @ApiResponse({status:200, description:'Ofertas activas del producto', type: [ProductPrices]})
+  findActiveOffersByProduct(@Param('productId') productId: string) {
+    return this.productPricesService.findActiveOffersByProduct(productId);
+  }
+
+  @Get('product/:productId/regular-price')
+  @ApiResponse({status:200, description:'Precio regular del producto', type: ProductPrices})
+  findRegularPriceByProduct(@Param('productId') productId: string) {
+    return this.productPricesService.findRegularPriceByProduct(productId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productPricesService.findOne(id);
@@ -37,6 +49,12 @@ export class ProductPricesController {
         @Body() updateProductPriceDto: UpdateProductPriceDto) 
         {
     return this.productPricesService.update(id, updateProductPriceDto);
+  }
+
+  @Patch(':id/toggle-state')
+  @ApiResponse({status:200, description:'Estado del precio alternado exitosamente', type: ProductPrices})
+  togglePriceState(@Param('id') id: string) {
+    return this.productPricesService.togglePriceState(id);
   }
 
   @Delete(':id')

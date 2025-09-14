@@ -11,12 +11,14 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { Member } from 'src/users/entities/member.entity';
 import { Admin } from 'src/users/entities/admin.entity';
 import { SuperAdmin } from 'src/users/entities/super-admin.entity';
+import googleOauthConfig from 'src/google-auth/google-oauth.config';
 
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy ],
   imports: [
     ConfigModule,
+    ConfigModule.forFeature(googleOauthConfig),
     
     TypeOrmModule.forFeature([ User, Member, Admin, SuperAdmin ]),
 
