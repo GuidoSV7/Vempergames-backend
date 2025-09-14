@@ -163,7 +163,8 @@ export class ProductPricesService {
 
     async calculateFinalPrice(price: ProductPrices): Promise<number> {
         if (price.discountPercentage && price.discountPercentage > 0) {
-            return price.value * (1 - price.discountPercentage / 100);
+            const finalPrice = price.value * (1 - price.discountPercentage / 100);
+            return Math.round(finalPrice * 100) / 100; // Redondear a 2 decimales
         }
         return price.value;
     }
@@ -181,14 +182,18 @@ export class ProductPricesService {
 
     async findAllProductsWithOffers() {
         try {
+            this.logger.log('Finding all products with offers...');
+            
             const offers = await this.productPriceRepository.find({
                 where: {
                     state: true,
-                    discountPercentage: Not(null)
+                    discountPercentage: Not(0)
                 },
                 relations: ['product', 'product.category'],
                 order: { discountPercentage: 'DESC' }
             });
+
+            this.logger.log(`Found ${offers.length} offers in database`);
 
             // Agrupar por producto y tomar la mejor oferta de cada uno
             const productOffersMap = new Map();
@@ -220,9 +225,11 @@ export class ProductPricesService {
                 }
             }
 
-            return Array.from(productOffersMap.values());
+            const result = Array.from(productOffersMap.values());
+            this.logger.log(`Returning ${result.length} products with offers`);
+            return result;
         } catch (error) {
-            this.logger.error(error.message);
+            this.logger.error('Error finding all products with offers:', error.message);
             throw new InternalServerErrorException('Error finding all products with offers');
         }
     }
