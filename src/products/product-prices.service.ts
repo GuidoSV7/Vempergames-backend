@@ -178,4 +178,52 @@ export class ProductPricesService {
             throw new InternalServerErrorException('Error toggling price state');
         }
     }
+
+    async findAllProductsWithOffers() {
+        try {
+            const offers = await this.productPriceRepository.find({
+                where: {
+                    state: true,
+                    discountPercentage: Not(null)
+                },
+                relations: ['product', 'product.category'],
+                order: { discountPercentage: 'DESC' }
+            });
+
+            // Agrupar por producto y tomar la mejor oferta de cada uno
+            const productOffersMap = new Map();
+            
+            for (const offer of offers) {
+                if (offer.discountPercentage > 0) {
+                    const productId = offer.product.id;
+                    const finalPrice = await this.calculateFinalPrice(offer);
+                    
+                    if (!productOffersMap.has(productId) || 
+                        offer.discountPercentage > productOffersMap.get(productId).offerPrice.discountPercentage) {
+                        
+                        productOffersMap.set(productId, {
+                            id: offer.product.id,
+                            title: offer.product.title,
+                            imageUrl: offer.product.imageUrl,
+                            category: offer.product.category,
+                            state: offer.product.state,
+                            offerPrice: {
+                                id: offer.id,
+                                name: offer.name,
+                                value: offer.value,
+                                discountPercentage: offer.discountPercentage,
+                                finalPrice: finalPrice,
+                                state: offer.state
+                            }
+                        });
+                    }
+                }
+            }
+
+            return Array.from(productOffersMap.values());
+        } catch (error) {
+            this.logger.error(error.message);
+            throw new InternalServerErrorException('Error finding all products with offers');
+        }
+    }
 }

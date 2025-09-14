@@ -33,6 +33,12 @@ export class ProductPricesController {
     return this.productPricesService.findActiveOffersByProduct(productId);
   }
 
+  @Get('offers')
+  @ApiResponse({status:200, description:'Todos los productos con ofertas activas'})
+  findAllProductsWithOffers() {
+    return this.productPricesService.findAllProductsWithOffers();
+  }
+
   @Get('product/:productId/regular-price')
   @ApiResponse({status:200, description:'Precio regular del producto', type: ProductPrices})
   findRegularPriceByProduct(@Param('productId') productId: string) {
