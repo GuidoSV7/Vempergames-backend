@@ -17,10 +17,11 @@ export class Product {
 
   @ApiProperty({
     description: 'Descripción del producto (HTML/Markdown)',
-    example: '<p>Gift card de Amazon por valor de $50 USD</p><ul><li>Válido en toda la tienda</li><li>Sin fecha de expiración</li></ul>'
+    example: '<p>Gift card de Amazon por valor de $50 USD</p><ul><li>Válido en toda la tienda</li><li>Sin fecha de expiración</li></ul>',
+    required: false
   })
-  @Column('text')
-  description: string;
+  @Column('text', { nullable: true })
+  description?: string;
 
   @ApiProperty({
     description: 'URL de la imagen del producto',
@@ -31,17 +32,19 @@ export class Product {
 
   @ApiProperty({
     description: 'Código de canje del producto',
-    example: 'ABC123XYZ'
+    example: 'ABC123XYZ',
+    required: false
   })
-  @Column('text')
-  redeem: string;
+  @Column('text', { nullable: true })
+  redeem?: string;
 
   @ApiProperty({
     description: 'Términos y condiciones del producto (HTML/Markdown)',
-    example: '<h3>Términos y Condiciones</h3><p>Válido por 1 año desde la compra</p><table><tr><th>Restricción</th><th>Detalle</th></tr><tr><td>Región</td><td>Estados Unidos</td></tr></table>'
+    example: '<h3>Términos y Condiciones</h3><p>Válido por 1 año desde la compra</p><table><tr><th>Restricción</th><th>Detalle</th></tr><tr><td>Región</td><td>Estados Unidos</td></tr></table>',
+    required: false
   })
-  @Column('text')
-  termsConditions: string;
+  @Column('text', { nullable: true })
+  termsConditions?: string;
 
   @ApiProperty({
     description: 'Estado del producto (activo/inactivo)',

@@ -12,11 +12,12 @@ export class CreateProductDto {
 
   @ApiProperty({
     description: 'Descripción del producto',
-    example: 'Gift card de Amazon por valor de $50 USD'
+    example: 'Gift card de Amazon por valor de $50 USD',
+    required: false
   })
   @IsString()
-  @IsNotEmpty()
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @ApiProperty({
     description: 'URL de la imagen del producto',
@@ -28,19 +29,21 @@ export class CreateProductDto {
 
   @ApiProperty({
     description: 'Código de canje del producto',
-    example: 'ABC123XYZ'
+    example: 'ABC123XYZ',
+    required: false
   })
   @IsString()
-  @IsNotEmpty()
-  redeem: string;
+  @IsOptional()
+  redeem?: string;
 
   @ApiProperty({
     description: 'Términos y condiciones del producto',
-    example: 'Válido por 1 año desde la compra'
+    example: 'Válido por 1 año desde la compra',
+    required: false
   })
   @IsString()
-  @IsNotEmpty()
-  termsConditions: string;
+  @IsOptional()
+  termsConditions?: string;
 
   @ApiProperty({
     description: 'Estado del producto (activo/inactivo)',
