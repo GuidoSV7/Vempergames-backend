@@ -11,14 +11,22 @@ export class ProductPrices {
 
   @Column('decimal', {
     precision: 10,
-    scale: 2
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseFloat(value)
+    }
   })
   value: number;
 
   @Column('decimal', {
     precision: 5,
     scale: 2,
-    nullable: true
+    nullable: true,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => value ? parseFloat(value) : null
+    }
   })
   discountPercentage: number;
 

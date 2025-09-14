@@ -162,11 +162,14 @@ export class ProductPricesService {
     }
 
     async calculateFinalPrice(price: ProductPrices): Promise<number> {
-        if (price.discountPercentage && price.discountPercentage > 0) {
-            const finalPrice = price.value * (1 - price.discountPercentage / 100);
+        const value = Number(price.value);
+        const discountPercentage = Number(price.discountPercentage || 0);
+        
+        if (discountPercentage && discountPercentage > 0) {
+            const finalPrice = value * (1 - discountPercentage / 100);
             return Math.round(finalPrice * 100) / 100; // Redondear a 2 decimales
         }
-        return price.value;
+        return value;
     }
 
     async togglePriceState(id: string) {
@@ -215,9 +218,9 @@ export class ProductPricesService {
                             offerPrice: {
                                 id: offer.id,
                                 name: offer.name,
-                                value: offer.value,
-                                discountPercentage: offer.discountPercentage,
-                                finalPrice: finalPrice,
+                                value: Number(offer.value),
+                                discountPercentage: Number(offer.discountPercentage),
+                                finalPrice: Number(finalPrice),
                                 state: offer.state
                             }
                         });
