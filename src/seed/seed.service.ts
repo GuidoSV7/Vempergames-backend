@@ -7,6 +7,8 @@ import { User } from '../auth/entities/user.entity';
 import { Member } from '../users/entities/member.entity';
 import { Admin } from '../users/entities/admin.entity';
 import { SuperAdmin } from '../users/entities/super-admin.entity';
+import { SupportAgent } from '../chat/entities/support-agent.entity';
+import { initialData } from './data/seed-data';
 
 @Injectable()
 export class SeedService {
@@ -21,7 +23,9 @@ export class SeedService {
     @InjectRepository( Admin )
     private readonly adminRepository: Repository<Admin>,
     @InjectRepository( SuperAdmin )
-    private readonly superAdminRepository: Repository<SuperAdmin>
+    private readonly superAdminRepository: Repository<SuperAdmin>,
+    @InjectRepository( SupportAgent )
+    private readonly supportAgentRepository: Repository<SupportAgent>
   ) {}
 
   async runSeed() {
@@ -66,6 +70,10 @@ export class SeedService {
   async deleteTables() {
     this.logger.log('🗑️ Limpiando tablas existentes...');
     
+    // Limpiar tabla de SupportAgent primero (por las relaciones)
+    await this.supportAgentRepository.delete({});
+    this.logger.log('✅ Tabla support_agents limpiada');
+    
     // Con @ChildEntity, todas las entidades se guardan en la misma tabla 'users'
     // Solo necesitamos limpiar la tabla principal
     await this.userRepository.delete({});
@@ -74,43 +82,98 @@ export class SeedService {
   }
 
   private async insertUsers() {
-    this.logger.log('👥 Creando usuarios de prueba...');
+    this.logger.log('👥 Creando usuarios desde seed-data...');
 
-    // Crear usuario SuperAdmin
-    const superAdmin = this.superAdminRepository.create({
-      email: 'superadmin@gmail.com',
-      userName: 'SuperAdmin',
-      password: bcrypt.hashSync('123456', 10),
-      roles: 'superadmin',
-      isActive: true
-    });
+    const createdUsers = [];
 
-    // Crear usuario Admin
-    const admin = this.adminRepository.create({
-      email: 'admin@gmail.com',
-      userName: 'Admin',
-      password: bcrypt.hashSync('123456', 10),
-      roles: 'admin',
-      isActive: true
-    });
+    for (const userData of initialData.users) {
+      let savedUser;
 
-    // Crear usuario Member
-    const member = this.memberRepository.create({
-      email: 'member@gmail.com',
-      userName: 'Member',
-      password: bcrypt.hashSync('123456', 10),
-      roles: 'member',
-      balance: 0,
-      discount: 0,
-      isActive: true
-    });
+      switch (userData.roles) {
+        case 'superadmin':
+          const superAdmin = this.superAdminRepository.create({
+            email: userData.email,
+            userName: userData.userName,
+            password: userData.password,
+            roles: userData.roles,
+            isActive: userData.isActive
+          });
+          savedUser = await this.superAdminRepository.save(superAdmin);
+          this.logger.log(`✅ SuperAdmin creado: ${userData.userName}`);
+          break;
 
-    // Guardar usuarios
-    const savedSuperAdmin = await this.superAdminRepository.save(superAdmin);
-    const savedAdmin = await this.adminRepository.save(admin);
-    const savedMember = await this.memberRepository.save(member);
+        case 'admin':
+          const admin = this.adminRepository.create({
+            email: userData.email,
+            userName: userData.userName,
+            password: userData.password,
+            roles: userData.roles,
+            isActive: userData.isActive
+          });
+          savedUser = await this.adminRepository.save(admin);
+          this.logger.log(`✅ Admin creado: ${userData.userName}`);
+          break;
 
-    this.logger.log('✅ Usuarios creados:');
-    return savedSuperAdmin;
+        case 'member':
+          const member = this.memberRepository.create({
+            email: userData.email,
+            userName: userData.userName,
+            password: userData.password,
+            roles: userData.roles,
+            balance: userData.balance || 0,
+            discount: userData.discount || 0,
+            isActive: userData.isActive
+          });
+          savedUser = await this.memberRepository.save(member);
+          this.logger.log(`✅ Member creado: ${userData.userName}`);
+          break;
+
+        case 'support':
+          // Crear usuario support (se guarda en la tabla users)
+          const supportUser = this.userRepository.create({
+            email: userData.email,
+            userName: userData.userName,
+            password: userData.password,
+            roles: userData.roles,
+            isActive: userData.isActive
+          });
+          savedUser = await this.userRepository.save(supportUser);
+          
+          // Crear SupportAgent
+          const supportAgent = this.supportAgentRepository.create({
+            userId: savedUser.id,
+            name: userData.userName,
+            email: userData.email,
+            isActive: true,
+            maxConcurrentChats: 10,
+            currentActiveChats: 0
+          });
+          await this.supportAgentRepository.save(supportAgent);
+          this.logger.log(`✅ Support creado: ${userData.userName} con SupportAgent`);
+          break;
+
+        case 'reseller':
+          // Crear usuario reseller (se guarda en la tabla users)
+          const resellerUser = this.userRepository.create({
+            email: userData.email,
+            userName: userData.userName,
+            password: userData.password,
+            roles: userData.roles,
+            isActive: userData.isActive
+          });
+          savedUser = await this.userRepository.save(resellerUser);
+          this.logger.log(`✅ Reseller creado: ${userData.userName}`);
+          break;
+
+        default:
+          this.logger.warn(`⚠️ Rol no reconocido: ${userData.roles}`);
+          continue;
+      }
+
+      createdUsers.push(savedUser);
+    }
+
+    this.logger.log('✅ Todos los usuarios creados exitosamente');
+    return createdUsers[0]; // Retornar el primer usuario (SuperAdmin)
   }
 }

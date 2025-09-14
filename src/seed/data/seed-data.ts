@@ -1,35 +1,59 @@
 import * as bcrypt from 'bcrypt';
 
-
-
-
 interface SeedUser {
     email:    string;
-    fullName: string;
+    userName: string;
     password: string;
-    roles:     string[];
+    roles:    string;
+    isActive: boolean;
+    balance?: number;
+    discount?: number;
 }
-
 
 interface SeedData {
     users: SeedUser[];
 }
 
-
 export const initialData: SeedData = {
-
     users: [
         {
-            email: 'test1@google.com',
-            fullName: 'Test One',
-            password: bcrypt.hashSync( 'Abc123', 10 ),
-            roles: ['admin']
+            email: 'superadmin@gmail.com',
+            userName: 'SuperAdmin',
+            password: bcrypt.hashSync('123456', 10),
+            roles: 'superadmin',
+            isActive: true
         },
         {
-            email: 'test2@google.com',
-            fullName: 'Test Two',
-            password: bcrypt.hashSync( 'Abc123', 10 ),
-            roles: ['user','super']
+            email: 'admin@gmail.com',
+            userName: 'Admin',
+            password: bcrypt.hashSync('123456', 10),
+            roles: 'admin',
+            isActive: true
+        },
+        {
+            email: 'member@gmail.com',
+            userName: 'Member',
+            password: bcrypt.hashSync('123456', 10),
+            roles: 'member',
+            isActive: true,
+            balance: 0,
+            discount: 0
+        },
+        {
+            email: 'support@gmail.com',
+            userName: 'Support Agent',
+            password: bcrypt.hashSync('123456', 10),
+            roles: 'support',
+            isActive: true
+        },
+        {
+            email: 'reseller@gmail.com',
+            userName: 'Reseller',
+            password: bcrypt.hashSync('123456', 10),
+            roles: 'reseller',
+            isActive: true,
+            balance: 0,
+            discount: 10
         }
     ]
 }
