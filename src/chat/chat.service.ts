@@ -306,4 +306,43 @@ export class ChatService {
             } : undefined
         };
     }
+
+    // ===== WEBSOCKET METHODS =====
+
+    async sendMessage(sessionId: string, message: string, sender: MessageSender, userId: string): Promise<ChatMessage> {
+        const session = await this.chatSessionRepository.findOne({
+            where: { id: sessionId }
+        });
+
+        if (!session) {
+            throw new NotFoundException('Sesión de chat no encontrada');
+        }
+
+        if (session.status === ChatSessionStatus.CLOSED) {
+            throw new BadRequestException('No puedes enviar mensajes a una sesión cerrada');
+        }
+
+        const chatMessage = this.chatMessageRepository.create({
+            sessionId,
+            message,
+            sender,
+            timestamp: new Date()
+        });
+
+        // Actualizar timestamp de la sesión
+        session.lastMessageAt = new Date();
+        if (session.status === ChatSessionStatus.PENDING) {
+            session.status = ChatSessionStatus.ACTIVE;
+        }
+
+        await this.chatSessionRepository.save(session);
+        return await this.chatMessageRepository.save(chatMessage);
+    }
+
+    async getSessionById(sessionId: string): Promise<ChatSession | null> {
+        return await this.chatSessionRepository.findOne({
+            where: { id: sessionId },
+            relations: ['user', 'supportAgent']
+        });
+    }
 }

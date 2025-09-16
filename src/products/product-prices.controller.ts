@@ -39,23 +39,6 @@ export class ProductPricesController {
     return this.productPricesService.findAllProductsWithOffers();
   }
 
-  @Get('offers-test')
-  @ApiResponse({status:200, description:'Test endpoint para ofertas'})
-  async testOffers() {
-    try {
-      const offers = await this.productPricesService.findAll({ limit: 100, offset: 0 });
-      return {
-        message: 'Test endpoint funcionando',
-        totalOffers: offers.length,
-        offers: offers.filter(offer => offer.discountPercentage > 0)
-      };
-    } catch (error) {
-      return {
-        error: error.message,
-        message: 'Error en test endpoint'
-      };
-    }
-  }
 
   @Get('product/:productId/regular-price')
   @ApiResponse({status:200, description:'Precio regular del producto', type: ProductPrices})

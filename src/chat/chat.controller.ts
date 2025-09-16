@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { SupportAgentService } from './support-agent.service';
+import { ChatGateway } from './chat.gateway';
 import { 
     CreateChatSessionDto, 
     SendMessageDto, 
@@ -32,6 +33,7 @@ export class ChatController {
     constructor(
         private readonly chatService: ChatService,
         private readonly supportAgentService: SupportAgentService,
+        private readonly chatGateway: ChatGateway,
     ) {}
 
     // ===== USER ENDPOINTS =====
@@ -52,6 +54,10 @@ export class ChatController {
         @Body() createChatSessionDto: CreateChatSessionDto
     ) {
         const session = await this.chatService.createChatSession(user.id, createChatSessionDto);
+        
+        // Notificar a agentes de soporte sobre nueva sesión pendiente
+        await this.chatGateway.notifyNewPendingSession(session.id, user.id);
+        
         return {
             success: true,
             data: session,
@@ -95,6 +101,10 @@ export class ChatController {
         @GetUser() user: User
     ) {
         await this.chatService.closeChatSession(sessionId, user.id);
+        
+        // Notificar cierre de sesión via WebSocket
+        await this.chatGateway.notifySessionClosed(sessionId, user.id);
+        
         return {
             success: true,
             message: 'Sesión cerrada exitosamente'
@@ -155,6 +165,11 @@ export class ChatController {
         @Body() assignSessionDto: AssignSessionDto
     ) {
         const session = await this.chatService.assignChatSession(sessionId, assignSessionDto);
+        
+        // Notificar asignación via WebSocket
+        await this.chatGateway.notifySessionAssigned(sessionId, assignSessionDto.supportAgentId);
+        await this.chatGateway.notifySessionStatusChange(sessionId, 'active');
+        
         return {
             success: true,
             data: session,

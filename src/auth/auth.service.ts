@@ -91,11 +91,8 @@ export class AuthService {
       select: { email: true, password: true, roles: true, id: true }
     });
   
-    if (!user)
-      throw new UnauthorizedException('Credentials are not valid (email)');
-  
-    if (!bcrypt.compareSync(password, user.password))
-      throw new UnauthorizedException('Credentials are not valid (password)');
+    if (!user || !bcrypt.compareSync(password, user.password))
+      throw new UnauthorizedException('Invalid credentials');
   
     // If user is an admin, get associated data
     let adminData = null;
