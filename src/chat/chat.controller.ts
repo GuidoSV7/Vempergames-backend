@@ -27,7 +27,7 @@ import { UserRoleGuard } from '../auth/guards/user-role.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { User } from '../auth/entities/user.entity';
 
-@Controller('api/chat')
+@Controller('chat')
 @UseGuards(AuthGuard('jwt'))
 export class ChatController {
     constructor(
