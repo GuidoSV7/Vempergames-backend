@@ -184,37 +184,45 @@ export class GoogleAuthService {
         throw new BadRequestException('El nombre es requerido');
       }
 
-      // Verificar que el googleId sea único
-      const existingUserByGoogleId = await this.userRepository.findOne({
-        where: { googleId }
-      });
-
-      if (existingUserByGoogleId && existingUserByGoogleId.email !== email) {
-        throw new ConflictException('Ya existe un usuario con este Google ID');
-      }
-
-      // Buscar usuario existente por email
+      // Buscar usuario existente por email O por googleId
       let existingUser = await this.userRepository.findOne({
-        where: { email: email.toLowerCase() }
+        where: [
+          { email: email.toLowerCase() },
+          { googleId: googleId }
+        ]
       });
+
+      // Si encontramos un usuario por googleId pero con email diferente, es un conflicto
+      if (existingUser && existingUser.googleId === googleId && existingUser.email !== email.toLowerCase()) {
+        throw new ConflictException('Ya existe un usuario con este Google ID vinculado a otro email');
+      }
 
       let isNewUser = false;
 
       if (existingUser) {
-        // Usuario existe - verificar si ya tiene googleId
-        if (existingUser.googleId && existingUser.googleId !== googleId) {
-          throw new ConflictException('Ya existe un usuario con este email vinculado a otra cuenta de Google');
-        }
+        // Usuario existe - actualizar datos si es necesario
+        let needsUpdate = false;
 
-        // Actualizar googleId si no lo tiene
-        if (!existingUser.googleId) {
+        // Actualizar googleId si no lo tiene o es diferente
+        if (!existingUser.googleId || existingUser.googleId !== googleId) {
           existingUser.googleId = googleId;
-          await this.userRepository.save(existingUser);
+          needsUpdate = true;
         }
 
         // Actualizar userName si es diferente
         if (existingUser.userName !== name) {
           existingUser.userName = name;
+          needsUpdate = true;
+        }
+
+        // Actualizar type si no es 'member'
+        if (existingUser.type !== 'member') {
+          existingUser.type = 'member';
+          needsUpdate = true;
+        }
+
+        // Guardar cambios si es necesario
+        if (needsUpdate) {
           await this.userRepository.save(existingUser);
         }
 
