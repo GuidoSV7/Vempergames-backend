@@ -56,20 +56,6 @@ export class GoogleAuthService {
 
       const savedUser = await this.userRepository.save(newUser);
 
-      // Create corresponding member record
-      const member = this.memberRepository.create({
-        email,
-        userName: name, // Use name as userName
-        googleId,
-        roles: 'member',
-        balance: 0,
-        discount: 0,
-        isActive: true,
-        password: null
-      });
-
-      await this.memberRepository.save(member);
-
       // Remove password from response
       const { password: _, ...userWithoutPassword } = savedUser;
 
@@ -125,20 +111,6 @@ export class GoogleAuthService {
       });
 
       const savedUser = await this.userRepository.save(newUser);
-
-      // Create corresponding member record
-      const member = this.memberRepository.create({
-        email,
-        userName: name,
-        googleId,
-        roles: 'member',
-        balance: 0,
-        discount: 0,
-        isActive: true,
-        password: null
-      });
-
-      await this.memberRepository.save(member);
 
       const { password: _, ...userWithoutPassword } = savedUser;
       return {
@@ -251,20 +223,6 @@ export class GoogleAuthService {
       });
 
       const savedUser = await this.userRepository.save(newUser);
-
-      // Crear registro correspondiente en Member
-      const member = this.memberRepository.create({
-        email: email.toLowerCase(),
-        userName: name,
-        googleId,
-        roles: 'member',
-        balance: 0,
-        discount: 0,
-        isActive: true,
-        password: null
-      });
-
-      await this.memberRepository.save(member);
 
       const { password: _, ...userWithoutPassword } = savedUser;
 
