@@ -49,6 +49,7 @@ export class GoogleAuthService {
         userName: name, // Use name as userName
         googleId,
         roles: 'member', // Default role for Google users
+        type: 'member', // Default type for Google users
         isActive: true,
         password: null // No password for Google users
       });
@@ -118,6 +119,7 @@ export class GoogleAuthService {
         userName: name,
         googleId,
         roles: 'member',
+        type: 'member', // Default type for Google users
         isActive: true,
         password: null
       });
@@ -234,6 +236,7 @@ export class GoogleAuthService {
         userName: name,
         googleId,
         roles: 'member', // Rol por defecto para usuarios de Google
+        type: 'member', // Tipo por defecto para usuarios de Google
         isActive: true,
         password: null, // No password para usuarios de Google
         registrationDate: new Date()
