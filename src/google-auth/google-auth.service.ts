@@ -43,18 +43,19 @@ export class GoogleAuthService {
         };
       }
 
-      // Create new user with Google data
-      const newUser = this.userRepository.create({
+      // Create new user as Member (using table inheritance)
+      const newUser = this.memberRepository.create({
         email,
         userName: name, // Use name as userName
         googleId,
         roles: 'member', // Default role for Google users
-        type: 'member', // Default type for Google users
         isActive: true,
-        password: null // No password for Google users
+        password: null, // No password for Google users
+        balance: 0, // Initial balance
+        discount: 0 // Initial discount
       });
 
-      const savedUser = await this.userRepository.save(newUser);
+      const savedUser = await this.memberRepository.save(newUser);
 
       // Remove password from response
       const { password: _, ...userWithoutPassword } = savedUser;
@@ -99,18 +100,19 @@ export class GoogleAuthService {
         };
       }
 
-      // Create new user
-      const newUser = this.userRepository.create({
+      // Create new user as Member (using table inheritance)
+      const newUser = this.memberRepository.create({
         email,
         userName: name,
         googleId,
         roles: 'member',
-        type: 'member', // Default type for Google users
         isActive: true,
-        password: null
+        password: null,
+        balance: 0, // Initial balance
+        discount: 0 // Initial discount
       });
 
-      const savedUser = await this.userRepository.save(newUser);
+      const savedUser = await this.memberRepository.save(newUser);
 
       const { password: _, ...userWithoutPassword } = savedUser;
       return {
@@ -210,19 +212,20 @@ export class GoogleAuthService {
         };
       }
 
-      // Crear nuevo usuario
-      const newUser = this.userRepository.create({
+      // Crear nuevo usuario como Member (usando herencia de tabla)
+      const newUser = this.memberRepository.create({
         email: email.toLowerCase(),
         userName: name,
         googleId,
         roles: 'member', // Rol por defecto para usuarios de Google
-        type: 'member', // Tipo por defecto para usuarios de Google
         isActive: true,
         password: null, // No password para usuarios de Google
+        balance: 0, // Balance inicial
+        discount: 0, // Descuento inicial
         registrationDate: new Date()
       });
 
-      const savedUser = await this.userRepository.save(newUser);
+      const savedUser = await this.memberRepository.save(newUser);
 
       const { password: _, ...userWithoutPassword } = savedUser;
 
